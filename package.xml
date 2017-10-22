@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>baldor</name>
+  <version>0.0.0</version>
+  <description>The baldor package</description>
+
+  <author email="fsuarez6@gmail.com">Francisco Suarez-Ruiz</author>
+  <maintainer email="fsuarez6@gmail.com">Francisco Suarez-Ruiz</maintainer>
+  <license>BSD 3-Clause</license>
+  <url type="website">http://wiki.ros.org/baldor</url>
+  <url type="repository">https://github.com/crigroup/baldor</url>
+  <url type="bugtracker">https://github.com/crigroup/baldor/issues</url>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>rosbash</depend>
+
+  <exec_depend>python-numpy</exec_depend>
+
+  <doc_depend>python-sphinx</doc_depend>
+  <doc_depend>python-sphinx-rtd-theme</doc_depend>
+  <doc_depend>rosdoc_lite</doc_depend>
+
+  <export>
+    <rosdoc config="rosdoc.yaml"/>
+  </export>
+
+</package>
