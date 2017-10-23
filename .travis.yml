@@ -51,5 +51,5 @@ script:
   - catkin_make run_tests
   - catkin_test_results
   # Build the docs
-  - roscd baldor
+  - cd ~/catkin_ws/src/baldor
   - rosdoc_lite .

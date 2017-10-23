@@ -12,7 +12,6 @@
   <url type="bugtracker">https://github.com/crigroup/baldor/issues</url>
 
   <buildtool_depend>catkin</buildtool_depend>
-  <depend>rosbash</depend>
 
   <exec_depend>python-numpy</exec_depend>
 
