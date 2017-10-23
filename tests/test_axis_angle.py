@@ -28,10 +28,10 @@ class TestModule(unittest.TestCase):
     point = np.random.sample(3) - 0.5
     T0 = br.axis_angle.to_transform(axis, angle, point)
     T1 = br.axis_angle.to_transform(axis, angle-2*np.pi, point)
-    self.assertTrue(br.transform.almost_equal(T0, T1))
+    self.assertTrue(br.transform.are_equal(T0, T1))
     T0 = br.axis_angle.to_transform(axis, angle, point)
     T1 = br.axis_angle.to_transform(-axis, -angle, point)
-    self.assertTrue(br.transform.almost_equal(T0, T1))
+    self.assertTrue(br.transform.are_equal(T0, T1))
     T = br.axis_angle.to_transform(axis, np.pi*2)
     np.testing.assert_allclose(T, np.eye(4), rtol=1e-7, atol=1e-8)
     T = br.axis_angle.to_transform(axis, np.pi/2., point)

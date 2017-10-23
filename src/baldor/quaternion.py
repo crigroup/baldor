@@ -6,9 +6,11 @@ Functions to operate quaternions.
 """
 import math
 import numpy as np
+# Local modules
+import baldor as br
 
 
-def almost_equal(q1, q2, rtol=1e-5, atol=1e-8):
+def are_equal(q1, q2, rtol=1e-5, atol=1e-8):
   """
   Returns True if two quaternions are equal within a tolerance.
 
@@ -40,17 +42,16 @@ def almost_equal(q1, q2, rtol=1e-5, atol=1e-8):
   --------
   >>> import baldor as br
   >>> q1 = [1, 0, 0, 0]
-  >>> br.quaternion.almost_equal(q1, [0, 1, 0, 0])
+  >>> br.quaternion.are_equal(q1, [0, 1, 0, 0])
   False
-  >>> br.quaternion.almost_equal(q1, [1, 0, 0, 0])
+  >>> br.quaternion.are_equal(q1, [1, 0, 0, 0])
   True
-  >>> br.quaternion.almost_equal(q1, [-1, 0, 0, 0])
+  >>> br.quaternion.are_equal(q1, [-1, 0, 0, 0])
   True
   """
   if np.allclose(q1, q2, rtol, atol):
     return True
   return np.allclose(np.array(q1)*-1, q2, rtol, atol)
-
 
 def conjugate(q):
   """
@@ -164,7 +165,7 @@ def norm(q):
 
 def random(rand=None):
   """
-  Generate a uniform random unit quaternion.
+  Generate an uniform random unit quaternion.
 
   Parameters
   ----------
@@ -200,13 +201,13 @@ def random(rand=None):
   t2 = pi2 * rand[2]
   return np.array([np.cos(t2)*r2, np.sin(t1)*r1, np.cos(t1)*r1, np.sin(t2)*r2])
 
-def to_axis_angle(q, identity_thresh=None):
+def to_axis_angle(quaternion, identity_thresh=None):
   """
   Return axis-angle rotation from a quaternion
 
   Parameters
   -------
-  q : array_like
+  quaternion: array_like
     Input quaternion (4 element sequence)
   identity_thresh : None or scalar, optional
     Threshold below which the norm of the vector part of the quaternion (x,
@@ -225,7 +226,7 @@ def to_axis_angle(q, identity_thresh=None):
   -----
   Quaternions :math:`w + ix + jy + kz` are represented as :math:`[w, x, y, z]`.
   A quaternion for which x, y, z are all equal to 0, is an identity rotation.
-  In this case we return a angle=0 and axis=[1, 0, 0]. This is an arbitrary
+  In this case we return a `angle=0` and `axis=[1, 0, 0]``. This is an arbitrary
   vector.
 
   Examples
@@ -238,16 +239,16 @@ def to_axis_angle(q, identity_thresh=None):
   >>> angle
   1.5
   """
-  w, x, y, z = quat
-  Nq = norm(quat)
+  w, x, y, z = quaternion
+  Nq = norm(quaternion)
   if not np.isfinite(Nq):
     return np.array([1.0, 0, 0]), float('nan')
   if identity_thresh is None:
     try:
       identity_thresh = np.finfo(Nq.type).eps * 3
     except (AttributeError, ValueError): # Not a numpy type or not float
-      identity_thresh = _FLOAT_EPS * 3
-  if Nq < _FLOAT_EPS ** 2:  # Results unreliable after normalization
+      identity_thresh = br._FLOAT_EPS * 3
+  if Nq < br._FLOAT_EPS ** 2:  # Results unreliable after normalization
     return np.array([1.0, 0, 0]), 0.0
   if Nq != 1:  # Normalize if not normalized
     s = math.sqrt(Nq)
@@ -259,3 +260,81 @@ def to_axis_angle(q, identity_thresh=None):
   # Make sure w is not slightly above 1 or below -1
   theta = 2 * math.acos(max(min(w, 1), -1))
   return  np.array([x, y, z]) / math.sqrt(len2), theta
+
+def to_euler(quaternion, axes='sxyz'):
+  """
+  Return Euler angles from a quaternion using the specified axis sequence.
+
+  Parameters
+  ----------
+  q : array_like
+    Input quaternion (4 element sequence)
+  axes: str, optional
+    Axis specification; one of 24 axis sequences as string or encoded tuple
+
+  Returns
+  -------
+  ai: float
+    First rotation angle (according to axes).
+  aj: float
+    Second rotation angle (according to axes).
+  ak: float
+    Third rotation angle (according to axes).
+
+  Notes
+  -----
+  Many Euler angle triplets can describe the same rotation matrix
+  Quaternions :math:`w + ix + jy + kz` are represented as :math:`[w, x, y, z]`.
+
+  Examples
+  --------
+  >>> import numpy as np
+  >>> import baldor as br
+  >>> ai, aj, ak = br.quaternion.to_euler([0.99810947, 0.06146124, 0, 0])
+  >>> np.allclose([ai, aj, ak], [0.123, 0, 0])
+  True
+  """
+  return br.transform.to_euler(to_transform(quaternion), axes)
+
+def to_transform(quaternion):
+  """
+  Return Euler angles from a quaternion using the specified axis sequence.
+
+  Parameters
+  ----------
+  quaternion: array_like
+    Input quaternion (4 element sequence)
+  axes: str, optional
+    Axis specification; one of 24 axis sequences as string or encoded tuple
+
+  Returns
+  -------
+  T: array_like
+    Homogeneous transformation (4x4)
+
+  Notes
+  -----
+  Quaternions :math:`w + ix + jy + kz` are represented as :math:`[w, x, y, z]`.
+
+  Examples
+  --------
+  >>> import numpy as np
+  >>> import baldor as br
+  >>> M = br.quaternion.to_transform([1, 0, 0, 0]) # Identity quaternion
+  >>> np.allclose(M, np.eye(3))
+  True
+  >>> M = br.quaternion.to_transform([0, 1, 0, 0]) # 180 degree rot around X
+  >>> np.allclose(M, np.diag([1, -1, -1]))
+  True
+  """
+  q = np.array(quaternion, dtype=np.float64, copy=True)
+  n = np.dot(q, q)
+  if n < br._EPS:
+    return np.identity(4)
+  q *= math.sqrt(2.0 / n)
+  q = np.outer(q, q)
+  return np.array([
+      [1.0-q[2,2]-q[3,3],     q[1,2]-q[3,0],      q[1,3]+q[2,0], 0.0],
+      [    q[1,2]+q[3,0], 1.0-q[1,1]-q[3,3],      q[2,3]-q[1,0], 0.0],
+      [    q[1,3]-q[2,0],     q[2,3]+q[1,0], 1.0-q[1,1]-q[2, 2], 0.0],
+      [              0.0,               0.0,                0.0, 1.0]])

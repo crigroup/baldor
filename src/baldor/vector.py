@@ -4,6 +4,8 @@ Vector operations
 """
 import math
 import numpy as np
+# Local modules
+import baldor as br
 
 
 def unit(vector):
@@ -18,7 +20,7 @@ def unit(vector):
   Returns
   -------
   unit : array_like
-     vector divided by L2 norm
+    Vector divided by L2 norm
 
   Examples
   --------
@@ -44,7 +46,7 @@ def norm(vector):
   Returns
   -------
   norm: float
-   The computed norm
+    The computed norm
 
   Examples
   --------
@@ -77,9 +79,29 @@ def perpendicular(vector):
       # unit is (0, 0, 0)
       raise ValueError('Input vector cannot be a zero vector')
     # unit is (0, 0, Z)
-    result = np.array(br.Y_AXIS, dtype=np.float64, copy=True)
-  result = np.array([-unit[1], unit[0], 0], dtype=np.float64)
+    return br.Y_AXIS
+  result = np.array([-u[1], u[0], 0], dtype=np.float64)
   return result
+
+def skew(vector):
+  """
+  Returns the 3x3 skew matrix of the input vector.
+
+  The skew matrix is a square matrix `R` whose transpose is also its negative;
+  that is, it satisfies the condition :math:`-R = R^T`.
+
+  Parameters
+  ----------
+  vector: array_like
+    The input array
+
+  Returns
+  -------
+  R: array_like
+    The resulting 3x3 skew matrix
+  """
+  skv = np.roll(np.roll(np.diag(np.asarray(vector).flatten()), 1, 1), -1, 0)
+  return (skv - skv.T)
 
 def transform_between_vectors(vector_a, vector_b):
   """
@@ -97,13 +119,13 @@ def transform_between_vectors(vector_a, vector_b):
   transform: array_like
     The transformation between `vector_a` a `vector_b`
   """
-  ua = unit(vector_a)
-  ub = unit(vector_b)
-  c = np.dot(ua, ub)
+  newaxis = unit(vector_b)
+  oldaxis = unit(vector_a)
+  c = np.dot(oldaxis, newaxis)
   angle = np.arccos(c)
-  if np.isclose(c, -1.0) or np.allclose(ua, ub):
-    axis = perpendicular(ub)
+  if np.isclose(c, -1.0) or np.allclose(newaxis, oldaxis):
+    axis = perpendicular(newaxis)
   else:
-    axis = unit(np.cross(ua, ub))
+    axis = unit(np.cross(oldaxis, newaxis))
   transform = br.axis_angle.to_transform(axis, angle)
   return transform

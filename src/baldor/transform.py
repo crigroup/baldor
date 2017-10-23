@@ -8,7 +8,7 @@ import numpy as np
 import baldor as br
 
 
-def almost_equal(T1, T2, rtol=1e-5, atol=1e-8):
+def are_equal(T1, T2, rtol=1e-5, atol=1e-8):
   """
   Returns True if two homogeneous transformation are equal within a tolerance.
 
@@ -79,6 +79,19 @@ def to_axis_angle(transform):
     angle of rotation
   point: array_like
     point around which the rotation is performed
+
+  Examples
+  --------
+  >>> import numpy as np
+  >>> import baldor as br
+  >>> axis = np.random.sample(3) - 0.5
+  >>> angle = (np.random.sample(1) - 0.5) * (2*np.pi)
+  >>> point = np.random.sample(3) - 0.5
+  >>> T0 = br.axis_angle.to_transform(axis, angle, point)
+  >>> axis, angle, point = br.transform.to_axis_angle(T0)
+  >>> T1 = br.axis_angle.to_transform(axis, angle, point)
+  >>> br.transform.are_equal(T0, T1)
+  True
   """
   R = np.array(transform, dtype=np.float64, copy=False)
   R33 = R[:3,:3]
@@ -135,7 +148,7 @@ def to_euler(transform, axes='sxyz'):
   --------
   >>> import numpy as np
   >>> import baldor as br
-  >>> T0 = euler_matrix(1, 2, 3, 'syxz')
+  >>> T0 = br.euler.to_transform(1, 2, 3, 'syxz')
   >>> al, be, ga = br.transform.to_euler(T0, 'syxz')
   >>> T1 = br.euler.to_transform(al, be, ga, 'syxz')
   >>> np.allclose(T0, T1)
@@ -210,7 +223,7 @@ def to_quaternion(transform, isprecise=False):
   >>> q = br.transform.to_quaternion(np.diag([1, -1, -1, 1]))
   >>> np.allclose(q, [0, 1, 0, 0]) or np.allclose(q, [0, -1, 0, 0])
   True
-  >>> T = br.axis_angle.to_transform(0.123, (1, 2, 3))
+  >>> T = br.axis_angle.to_transform((1, 2, 3), 0.123)
   >>> q = br.transform.to_quaternion(T, True)
   >>> np.allclose(q, [0.9981095, 0.0164262, 0.0328524, 0.0492786])
   True
