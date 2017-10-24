@@ -1,8 +1,7 @@
 # baldor
-This ROS package gives Python support to work with Homogeneous Transformation
-Matrices, Quaternions and other classical methods to represent rotations.
+ROS (Python) package to work with Homogeneous Transformation Matrices, Quaternions, Euler angles, axis-angle rotations.
 
-It has been developed by [CRI Group](http://www.ntu.edu.sg/home/cuong/),
+This package has been developed by [CRI Group](http://www.ntu.edu.sg/home/cuong/),
 [Nanyang Technological University, Singapore](http://www.ntu.edu.sg).
 
 ### Maintainer
@@ -10,7 +9,7 @@ It has been developed by [CRI Group](http://www.ntu.edu.sg/home/cuong/),
 
 ### Documentation
 * Throughout the various files in this repository.
-* Website: http://wiki.ros.org/baldor
+* Website: http://wiki.ros.org/baldor (*Will be generated after releasing*)
 
 ## Travis - Continuous Integration
 
