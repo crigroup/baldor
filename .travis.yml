@@ -20,6 +20,8 @@ before_install:
   - sudo apt-get install -y python-catkin-pkg python-rosdep python-wstool ros-$ROS_DISTRO-catkin
   # Install docs tools
   - sudo apt-get install python-numpydoc ros-$ROS_DISTRO-rosdoc-lite
+  # Install coveralls
+  - pip install coveralls --user
   # Prepare rosdep to install dependencies.
   - source /opt/ros/$ROS_DISTRO/setup.bash
   - sudo rosdep init
@@ -52,3 +54,7 @@ script:
   # Build the docs
   - cd ~/catkin_ws/src/baldor
   - rosdoc_lite .
+  # Run coverage
+  - nosetests tests/ --with-coverage --cover-package=baldor
+after_success:
+  - coveralls
