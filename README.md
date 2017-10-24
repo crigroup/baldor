@@ -1,5 +1,5 @@
 # baldor
-[![Build Status](https://travis-ci.org/crigroup/baldor.svg?branch=master)](https://travis-ci.org/crigroup/baldor) [![Coverage](https://coveralls.io/repos/github/crigroup/baldor/badge.svg?branch=master)](https://coveralls.io/github/crigroup/baldor)
+[![Build Status](https://travis-ci.org/crigroup/baldor.svg?branch=master)](https://travis-ci.org/crigroup/baldor) [![Coverage Status](https://coveralls.io/repos/github/crigroup/baldor/badge.svg)](https://coveralls.io/github/crigroup/baldor)
 
 ROS (Python) package to work with Homogeneous Transformation Matrices, Quaternions, Euler angles, axis-angle rotations.
 
