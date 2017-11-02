@@ -62,6 +62,35 @@ def inverse(transform):
   inv[:3,3] = np.dot(-R, p)
   return inv
 
+def random(max_position=1.):
+  """
+  Generate a random homogeneous transformation.
+
+  Parameters
+  ----------
+  max_position: float, optional
+    Maximum value for the position components of the transformation
+
+  Returns
+  -------
+  T: array_like
+    The random homogeneous transformation
+
+  Examples
+  --------
+  >>> import numpy as np
+  >>> import baldor as br
+  >>> T = br.transform.random()
+  >>> Tinv = br.transform.inverse(T)
+  >>> np.allclose(np.dot(T, Tinv), np.eye(4))
+  True
+  """
+  quat = br.quaternion.random()
+  T = br.quaternion.to_transform(quat)
+  T[:3,3] = np.random.rand(3)*max_position
+  return T
+
+
 def to_axis_angle(transform):
   """
   Return rotation angle and axis from rotation matrix.
@@ -101,11 +130,11 @@ def to_axis_angle(transform):
   if not len(i):
     raise ValueError("no unit eigenvector corresponding to eigenvalue 1")
   axis = np.real(W[:, i[-1]]).squeeze()
-  # point: unit eigenvector of R33 corresponding to eigenvalue of 1
+  # point: unit eigenvector of R corresponding to eigenvalue of 1
   w, Q = np.linalg.eig(R)
   i = np.where(abs(np.real(w) - 1.0) < 1e-8)[0]
   if not len(i):
-      raise ValueError("no unit eigenvector corresponding to eigenvalue 1")
+    raise ValueError("no unit eigenvector corresponding to eigenvalue 1")
   point = np.real(Q[:, i[-1]]).squeeze()
   point /= point[3]
   # rotation angle depending on axis
@@ -118,6 +147,51 @@ def to_axis_angle(transform):
     sina = (R[2, 1] + (cosa-1.0)*axis[1]*axis[2]) / axis[0]
   angle = math.atan2(sina, cosa)
   return axis, angle, point
+
+def to_dual_quaternion(transform):
+  """
+  Return quaternion from the rotation part of an homogeneous transformation.
+
+  Parameters
+  ----------
+  transform: array_like
+    Rotation matrix. It can be (3x3) or (4x4)
+  isprecise: bool
+    If True, the input transform is assumed to be a precise rotation matrix and
+    a faster algorithm is used.
+
+  Returns
+  -------
+  qr: array_like
+    Quaternion in w, x, y z (real, then vector) for the rotation component
+  qt: array_like
+    Quaternion in w, x, y z (real, then vector) for the translation component
+
+  Notes
+  -----
+  Some literature prefers to use :math:`q` for the rotation component and
+  :math:`q'` for the translation component
+  """
+  cot = lambda x: 1./np.tan(x)
+  R = np.eye(4)
+  R[:3,:3] = transform[:3,:3]
+  l,theta,_ = to_axis_angle(R)
+  t = transform[:3,3]
+  # Pitch d
+  d = np.dot(l.reshape(1,3), t.reshape(3,1))
+  # Point c
+  c = 0.5*(t-d*l) + cot(theta/2.)*np.cross(l,t)
+  # Moment vector
+  m = np.cross(c, l)
+  # Rotation quaternion
+  qr = np.zeros(4)
+  qr[0] = np.cos(theta/2.)
+  qr[1:] = np.sin(theta/2.)*l
+  # Translation quaternion
+  qt = np.zeros(4)
+  qt[0] = -(1/2.)*np.dot(qr[1:],t)
+  qt[1:] = (1/2.)*(qr[0]*t + np.cross(t,qr[1:]))
+  return qr, qt
 
 def to_euler(transform, axes='sxyz'):
   """

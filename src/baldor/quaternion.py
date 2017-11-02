@@ -84,6 +84,34 @@ def conjugate(q):
   np.negative(qconj[1:], qconj[1:])
   return qconj
 
+def dual_to_transform(qr, qt):
+  """
+  Return a homogeneous transformation from the given dual quaternion.
+
+  Parameters
+  ----------
+  qr: array_like
+    Input quaternion for the rotation component (4 element sequence)
+  qt: array_like
+    Input quaternion for the translation component (4 element sequence)
+
+  Returns
+  -------
+  T: array_like
+    Homogeneous transformation (4x4)
+
+  Notes
+  -----
+  Some literature prefers to use :math:`q` for the rotation component and
+  :math:`q'` for the translation component
+  """
+  T = np.eye(4)
+  R = br.quaternion.to_transform(qr)[:3,:3]
+  t = 2*br.quaternion.multiply(qt, br.quaternion.conjugate(qr))
+  T[:3,:3] = R
+  T[:3,3] = t[1:]
+  return T
+
 def inverse(q):
   """
   Return multiplicative inverse of a quaternion
@@ -175,7 +203,7 @@ def random(rand=None):
 
   Returns
   -------
-  qrand: ndarray
+  qrand: array_like
     The random quaternion
 
   Notes
@@ -206,7 +234,7 @@ def to_axis_angle(quaternion, identity_thresh=None):
   Return axis-angle rotation from a quaternion
 
   Parameters
-  -------
+  ----------
   quaternion: array_like
     Input quaternion (4 element sequence)
   identity_thresh : None or scalar, optional
@@ -250,7 +278,7 @@ def to_axis_angle(quaternion, identity_thresh=None):
       identity_thresh = br._FLOAT_EPS * 3
   if Nq < br._FLOAT_EPS ** 2:  # Results unreliable after normalization
     return np.array([1.0, 0, 0]), 0.0
-  if Nq != 1:  # Normalize if not normalized
+  if not np.isclose(Nq, 1):  # Normalize if not normalized
     s = math.sqrt(Nq)
     w, x, y, z = w / s, x / s, y / s, z / s
   len2 = x*x + y*y + z*z
@@ -298,7 +326,7 @@ def to_euler(quaternion, axes='sxyz'):
 
 def to_transform(quaternion):
   """
-  Return Euler angles from a quaternion using the specified axis sequence.
+  Return homogeneous transformation from a quaternion.
 
   Parameters
   ----------
@@ -320,11 +348,11 @@ def to_transform(quaternion):
   --------
   >>> import numpy as np
   >>> import baldor as br
-  >>> M = br.quaternion.to_transform([1, 0, 0, 0]) # Identity quaternion
-  >>> np.allclose(M, np.eye(3))
+  >>> T0 = br.quaternion.to_transform([1, 0, 0, 0]) # Identity quaternion
+  >>> np.allclose(T0, np.eye(4))
   True
-  >>> M = br.quaternion.to_transform([0, 1, 0, 0]) # 180 degree rot around X
-  >>> np.allclose(M, np.diag([1, -1, -1]))
+  >>> T1 = br.quaternion.to_transform([0, 1, 0, 0]) # 180 degree rot around X
+  >>> np.allclose(T1, np.diag([1, -1, -1, 1]))
   True
   """
   q = np.array(quaternion, dtype=np.float64, copy=True)

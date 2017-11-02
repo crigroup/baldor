@@ -23,6 +23,11 @@ class TestModule(unittest.TestCase):
     q = br.euler.to_quaternion(1, 2, 3, 'ryxz')
     expected = [0.43595284, 0.31062245, -0.71828702, 0.44443511]
     np.testing.assert_allclose(q, expected)
+    q = br.euler.to_quaternion(1, 2, 3, (2, 0, 0, 1))
+    # Test parity
+    q = br.euler.to_quaternion(1, 2, 3, 'rzyz')
+    expected = [-0.2248451 ,  0.70807342,  0.45464871,  0.4912955]
+    np.testing.assert_allclose(q, expected)
 
   def test_to_transform(self):
     T = br.euler.to_transform(1, 2, 3, 'syxz')
