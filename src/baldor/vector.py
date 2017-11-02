@@ -73,13 +73,13 @@ def perpendicular(vector):
   result: array_like
     The perpendicular vector
   """
-  u = unit(vector)
-  if np.allclose(u[:2], np.zeros(2)):
-    if np.isclose(u[2], 0.):
+  if np.allclose(vector[:2], np.zeros(2)):
+    if np.isclose(vector[2], 0.):
       # unit is (0, 0, 0)
       raise ValueError('Input vector cannot be a zero vector')
     # unit is (0, 0, Z)
     return br.Y_AXIS
+  u = unit(vector)
   result = np.array([-u[1], u[0], 0], dtype=np.float64)
   return result
 
@@ -121,7 +121,8 @@ def transform_between_vectors(vector_a, vector_b):
   """
   newaxis = unit(vector_b)
   oldaxis = unit(vector_a)
-  c = np.dot(oldaxis, newaxis)
+  # Limits the value of `c` to be within the range C{[-1, 1]}
+  c = np.clip(np.dot(oldaxis, newaxis), -1., 1.)
   angle = np.arccos(c)
   if np.isclose(c, -1.0) or np.allclose(newaxis, oldaxis):
     axis = perpendicular(newaxis)

@@ -1,4 +1,5 @@
 #! /usr/bin/env python
+import math
 import unittest
 import numpy as np
 # Tested package
@@ -37,11 +38,28 @@ class TestModule(unittest.TestCase):
     for _ in range(100):
       q = br.quaternion.random()
       np.testing.assert_allclose(np.linalg.norm(q), 1)
+    # Test invalid seed lenght
+    def invalid_rand_seed():
+      br.quaternion.random(rand=[1,2])
+    self.assertRaises(AssertionError, invalid_rand_seed)
 
   def test_to_axis_angle(self):
     axis, angle = br.quaternion.to_axis_angle([0, 1, 0, 0])
     np.testing.assert_allclose(axis, [1, 0, 0])
     np.testing.assert_almost_equal(angle, np.pi)
+    # Identity
+    axis, angle = br.quaternion.to_axis_angle([1, 0, 0, 0])
+    np.testing.assert_allclose(axis, [1, 0, 0])
+    np.testing.assert_almost_equal(angle, 0)
+    # Test zeros quaternion
+    axis, angle = br.quaternion.to_axis_angle([0, 0, 0, 0])
+    np.testing.assert_allclose(axis, [1, 0, 0])
+    np.testing.assert_almost_equal(angle, 0)
+    # Test invalid quaternion
+    axis, angle = br.quaternion.to_axis_angle([float('inf'), 0, 0, 0])
+    np.testing.assert_allclose(axis, [1, 0, 0])
+    self.assertTrue(math.isnan(angle))
+
 
   def test_to_euler(self):
     q = [0.70105738, 0.43045933,  0.56098553, -0.09229596]
@@ -56,3 +74,6 @@ class TestModule(unittest.TestCase):
     np.testing.assert_allclose(T, np.identity(4))
     T = br.quaternion.to_transform([0, 1, 0, 0])
     np.testing.assert_allclose(T, np.diag([1, -1, -1, 1]))
+    # Test zeros
+    T = br.quaternion.to_transform(np.zeros(4))
+    self.assertTrue(br.transform.are_equal(T, np.eye(4)))
