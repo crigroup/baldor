@@ -234,7 +234,7 @@ def to_axis_angle(quaternion, identity_thresh=None):
   Return axis-angle rotation from a quaternion
 
   Parameters
-  -------
+  ----------
   quaternion: array_like
     Input quaternion (4 element sequence)
   identity_thresh : None or scalar, optional
