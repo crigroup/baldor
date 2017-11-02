@@ -175,7 +175,7 @@ def random(rand=None):
 
   Returns
   -------
-  qrand: ndarray
+  qrand: array_like
     The random quaternion
 
   Notes

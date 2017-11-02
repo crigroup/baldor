@@ -62,6 +62,34 @@ def inverse(transform):
   inv[:3,3] = np.dot(-R, p)
   return inv
 
+def random(max_position=1.):
+  """
+  Generate a random homogeneous transformation.
+
+  Parameters
+  ----------
+  max_position: float, optional
+    Maximum value for the position components of the transformation
+
+  Returns
+  -------
+  T: array_like
+    The random homogeneous transformation
+
+  Examples
+  --------
+  >>> import numpy as np
+  >>> import baldor as br
+  >>> T = br.transform.random()
+  >>> np.allclose(1, np.linalg.norm(q))
+  True
+  """
+  quat = br.quaternion.random()
+  T = br.quaternion.to_transform(quat)
+  T[:3,3] = np.random.rand(3)*max_position
+  return T
+
+
 def to_axis_angle(transform):
   """
   Return rotation angle and axis from rotation matrix.
