@@ -2,8 +2,8 @@
 Changelog for package baldor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.1 (2017-11-03)
+------------------
 * Add ROS buildfarm status
 * Add coveralls support
 * Contributors: Francisco
