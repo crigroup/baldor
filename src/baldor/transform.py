@@ -38,6 +38,33 @@ def are_equal(T1, T2, rtol=1e-5, atol=1e-8):
   M2 /= M2[3,3]
   return np.allclose(M1, M2, rtol, atol)
 
+def between_axes(axis_a, axis_b):
+  """
+  Compute the transformation that aligns two vectors/axes.
+
+  Parameters
+  ----------
+  axis_a: array_like
+    The initial axis
+  axis_b: array_like
+    The goal axis
+
+  Returns
+  -------
+  transform: array_like
+    The transformation that transforms `axis_a` into `axis_b`
+  """
+  a_unit = br.vector.unit(axis_a)
+  b_unit = br.vector.unit(axis_b)
+  c = np.dot(a_unit, b_unit)
+  angle = np.arccos(c)
+  if np.isclose(c, -1.0) or np.allclose(a_unit, b_unit):
+    axis = br.vector.perpendicular(b_unit)
+  else:
+    axis = br.vector.unit(np.cross(a_unit, b_unit))
+  transform = br.axis_angle.to_transform(axis, angle)
+  return transform
+
 def inverse(transform):
   """
   Compute the inverse of an homogeneous transformation.
