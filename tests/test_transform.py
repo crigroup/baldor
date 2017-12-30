@@ -14,6 +14,27 @@ class TestModule(unittest.TestCase):
     T3 = br.quaternion.to_transform([-1, 0, 0, 0])
     self.assertTrue(br.quaternion.are_equal(T2, T3))
 
+  def test_between_axes(self):
+    # Random axis / angle
+    np.random.seed(123)
+    axis = br.vector.unit(np.random.randn(3))
+    angle = np.deg2rad(45)
+    transform = br.axis_angle.to_transform(axis, angle)
+    newaxis = np.dot(transform[:3,:3], br.Z_AXIS)
+    est_transform = br.transform.between_axes(br.Z_AXIS, newaxis)
+    np.testing.assert_allclose(transform[:3,2], est_transform[:3,2])
+    # Edge case 1
+    newaxis = -br.Z_AXIS
+    transform = br.transform.between_axes(br.Z_AXIS, newaxis)
+    _, angle, _ = br.transform.to_axis_angle(transform)
+    np.testing.assert_allclose(angle, np.pi)
+    # Edge case 2
+    newaxis = br.Z_AXIS
+    transform = br.transform.between_axes(-br.Z_AXIS, newaxis)
+    _, angle, _ = br.transform.to_axis_angle(transform)
+    np.testing.assert_allclose(angle, np.pi)
+
+
   def test_inverse(self):
     q = br.quaternion.random()
     T = br.quaternion.to_transform(q)

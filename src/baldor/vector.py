@@ -73,13 +73,12 @@ def perpendicular(vector):
   result: array_like
     The perpendicular vector
   """
-  if np.allclose(vector[:2], np.zeros(2)):
-    if np.isclose(vector[2], 0.):
-      # unit is (0, 0, 0)
-      raise ValueError('Input vector cannot be a zero vector')
-    # unit is (0, 0, Z)
-    return br.Y_AXIS
+  if np.allclose(vector, np.zeros(3)):
+    # vector is [0, 0, 0]
+    raise ValueError('Input vector cannot be a zero vector')
   u = unit(vector)
+  if np.allclose(u[:2], np.zeros(2)):
+    return br.Y_AXIS
   result = np.array([-u[1], u[0], 0], dtype=np.float64)
   return result
 
