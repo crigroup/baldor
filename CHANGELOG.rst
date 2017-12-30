@@ -2,6 +2,11 @@
 Changelog for package baldor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add function to estimate the transformation between two axes (#3)
+* Contributors: Francisco
+
 0.1.1 (2017-11-03)
 ------------------
 * Add ROS buildfarm status
