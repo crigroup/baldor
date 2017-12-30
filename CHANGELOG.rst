@@ -2,8 +2,8 @@
 Changelog for package baldor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.2 (2017-12-30)
+------------------
 * Add function to estimate the transformation between two axes (#3)
 * Contributors: Francisco
 
