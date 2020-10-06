@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 from . import axis_angle
 from . import euler
 from . import quaternion
