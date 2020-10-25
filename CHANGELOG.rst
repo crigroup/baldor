@@ -2,8 +2,8 @@
 Changelog for package baldor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.1.3 (2020-10-25)
+------------------
 * Add support for ROS noetic and clean up
 * Contributors: fsuarez6
 
