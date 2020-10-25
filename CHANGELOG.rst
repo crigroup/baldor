@@ -2,6 +2,11 @@
 Changelog for package baldor
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add support for ROS noetic and clean up
+* Contributors: fsuarez6
+
 0.1.2 (2017-12-30)
 ------------------
 * Add function to estimate the transformation between two axes (#3)
