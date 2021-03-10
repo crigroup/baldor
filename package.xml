@@ -12,8 +12,6 @@
     <url type="repository">https://github.com/crigroup/baldor</url>
     <url type="bugtracker">https://github.com/crigroup/baldor/issues</url>
 
-    <buildtool_depend>catkin</buildtool_depend>
-
     <exec_depend condition="$ROS_PYTHON_VERSION == 2">python-numpy</exec_depend>
     <exec_depend condition="$ROS_PYTHON_VERSION == 3">python3-numpy</exec_depend>
 
@@ -21,6 +19,7 @@
 
     <export>
         <rosdoc config="rosdoc.yaml"/>
+        <build_type>ament_python</build_type>
     </export>
 
 </package>
